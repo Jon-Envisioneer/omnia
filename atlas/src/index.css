@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Layout: a cyanotype star-chart. The orrery (rings = time horizons, sectors =
+   realms) sits beside a specimen plate; codex, recombinator and invitations
+   follow as plates on the same blueprint paper.
+   Tokens are HSL triplets so shadcn components can share them. */
+@layer base {
+  :root {
+    --paper: 195 14% 94%;      /* sun-bleached blueprint paper */
+    --wash: 206 29% 88%;       /* faint cyan wash for plates */
+    --ink: 211 67% 17%;        /* prussian blue */
+    --ink-2: 210 28% 36%;      /* diluted ink for secondary text */
+    --rule: 207 24% 78%;       /* hairlines, rings */
+    --sun: 32 78% 38%;         /* iron-gall amber, the one accent */
+
+    --font-display: "Cormorant", "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --card: var(--paper);
+    --card-foreground: var(--ink);
+    --popover: var(--paper);
+    --popover-foreground: var(--ink);
+    --primary: var(--ink);
+    --primary-foreground: var(--paper);
+    --secondary: var(--wash);
+    --secondary-foreground: var(--ink);
+    --muted: var(--wash);
+    --muted-foreground: var(--ink-2);
+    --accent: var(--wash);
+    --accent-foreground: var(--ink);
+    --destructive: 0 70% 45%;
+    --destructive-foreground: var(--paper);
+    --border: var(--rule);
+    --input: var(--rule);
+    --ring: var(--sun);
+    --radius: 2px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: 213 68% 14%;
+      --wash: 212 58% 19%;
+      --ink: 206 45% 93%;
+      --ink-2: 208 30% 72%;
+      --rule: 212 42% 30%;
+      --sun: 36 85% 64%;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: 213 68% 14%;
+    --wash: 212 58% 19%;
+    --ink: 206 45% 93%;
+    --ink-2: 208 30% 72%;
+    --rule: 212 42% 30%;
+    --sun: 36 85% 64%;
+    color-scheme: dark;
+  }
+
+  * { @apply border-border; }
+
+  body {
+    background: hsl(var(--paper));
+    color: hsl(var(--ink));
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 { text-wrap: balance; }
+
+  a { color: inherit; text-underline-offset: 3px; }
+
+  :focus-visible { outline: 2px solid hsl(var(--sun)); outline-offset: 2px; }
+}
+
+@layer components {
+  .page {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 40px);
+    padding-block: 28px 80px;
+    display: grid;
+    gap: 72px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--ink-2));
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+  }
+
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  .plate-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid hsl(var(--ink));
+    margin-bottom: 28px;
+  }
+  .plate-head h2 { font-size: clamp(34px, 5vw, 52px); font-style: italic; }
+  .plate-head p { max-width: 62ch; color: hsl(var(--ink-2)); }
+
+  .chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 1px solid hsl(var(--rule));
+    background: transparent;
+    color: hsl(var(--ink-2));
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .chip:hover { border-color: hsl(var(--ink)); color: hsl(var(--ink)); }
+  .chip[aria-pressed="true"] {
+    background: hsl(var(--ink));
+    border-color: hsl(var(--ink));
+    color: hsl(var(--paper));
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    border: 1px solid hsl(var(--ink));
+    background: transparent;
+    color: hsl(var(--ink));
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .copy-btn:hover { background: hsl(var(--ink)); color: hsl(var(--paper)); }
+  .copy-btn[data-done="true"] { border-color: hsl(var(--sun)); color: hsl(var(--sun)); background: transparent; }
+
+  .meter { display: grid; grid-template-columns: 78px minmax(0, 1fr) 34px; align-items: center; gap: 10px; }
+  .meter-track { height: 3px; background: hsl(var(--rule)); position: relative; }
+  .meter-fill { position: absolute; inset: 0 auto 0 0; background: hsl(var(--ink)); }
+  .meter-fill.sun { background: hsl(var(--sun)); }
+
+  .orrery-grid { display: grid; gap: 40px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 960px) {
+    .orrery-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  }
+
+  .orrery-node { cursor: pointer; transition: r 0.2s; }
+  .orrery-node:focus { outline: none; }
+  .orrery-node:focus-visible { stroke: hsl(var(--sun)); stroke-width: 3; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .spin-slow { animation: spin 240s linear infinite; transform-origin: 400px 400px; }
+    .pulse { animation: pulse 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.6; } }
+}
