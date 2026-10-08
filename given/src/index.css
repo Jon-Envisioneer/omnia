@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Layout: the page is a context window. A thin meter at the top counts how much
+   of it you have read; every section carries its token offset in the margin;
+   titles are set in visible token pieces. Graph-paper sage and graphite ink for
+   the mathematical register, one ultramarine for what the reader can act on,
+   and three pale tokenizer tints that only ever mark token boundaries.
+   Tokens are HSL triplets so shadcn components can share them. */
+@layer base {
+  :root {
+    --paper: 84 14% 93%;   /* engineering paper */
+    --wash: 84 13% 88%;    /* panels */
+    --ink: 150 9% 11%;     /* graphite */
+    --ink-2: 150 5% 35%;   /* secondary text */
+    --rule: 84 9% 77%;     /* hairlines */
+    --mark: 229 62% 44%;   /* ultramarine: links, controls, selection */
+    --tok-a: 50 82% 80%;   /* tokenizer tints */
+    --tok-b: 158 42% 81%;
+    --tok-c: 205 66% 85%;
+
+    --font-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+    --font-body: "STIX Two Text", "STIX Two", "Cambria", Georgia, serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+    --background: var(--paper);
+    --foreground: var(--ink);
+    --card: var(--paper);
+    --card-foreground: var(--ink);
+    --popover: var(--paper);
+    --popover-foreground: var(--ink);
+    --primary: var(--ink);
+    --primary-foreground: var(--paper);
+    --secondary: var(--wash);
+    --secondary-foreground: var(--ink);
+    --muted: var(--wash);
+    --muted-foreground: var(--ink-2);
+    --accent: var(--wash);
+    --accent-foreground: var(--ink);
+    --destructive: 0 70% 45%;
+    --destructive-foreground: var(--paper);
+    --border: var(--rule);
+    --input: var(--rule);
+    --ring: var(--mark);
+    --radius: 0px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: 150 10% 8%;
+      --wash: 150 8% 12%;
+      --ink: 80 14% 89%;
+      --ink-2: 80 6% 64%;
+      --rule: 150 6% 23%;
+      --mark: 228 92% 77%;
+      --tok-a: 48 38% 25%;
+      --tok-b: 160 28% 21%;
+      --tok-c: 210 36% 26%;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: 150 10% 8%;
+    --wash: 150 8% 12%;
+    --ink: 80 14% 89%;
+    --ink-2: 80 6% 64%;
+    --rule: 150 6% 23%;
+    --mark: 228 92% 77%;
+    --tok-a: 48 38% 25%;
+    --tok-b: 160 28% 21%;
+    --tok-c: 210 36% 26%;
+    color-scheme: dark;
+  }
+
+  * { @apply border-border; }
+
+  body {
+    background: hsl(var(--paper));
+    color: hsl(var(--ink));
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    /* graph paper: 24px grid, barely there */
+    background-image:
+      linear-gradient(hsl(var(--rule) / 0.28) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--rule) / 0.28) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  h1, h2, h3 { text-wrap: balance; }
+  a { color: hsl(var(--mark)); text-underline-offset: 3px; }
+  ::selection { background: hsl(var(--tok-c)); }
+  :focus-visible { outline: 2px solid hsl(var(--mark)); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+}
+
+/* Plain CSS rather than @layer components: some of these class names are
+ built at runtime (tok-0/1/2), and Tailwind drops layered classes it cannot
+ find literally in the source. */
+.wrap { max-width: 1180px; margin-inline: auto; padding-inline: 20px; }
+
+.display { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; line-height: 1.04; }
+.mono { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0; }
+.label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: hsl(var(--ink-2)); }
+.measure { max-width: 66ch; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* token pieces: alternate three tints, never more */
+.tok { border-radius: 0; padding: 0 0.04em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.tok-0 { background: hsl(var(--tok-a)); }
+.tok-1 { background: hsl(var(--tok-b)); }
+.tok-2 { background: hsl(var(--tok-c)); }
+
+/* a section: margin gutter with the token offset, then the body */
+.section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding-block: 64px 24px; border-top: 1px solid hsl(var(--ink)); }
+@media (min-width: 900px) {
+  .section { grid-template-columns: 120px minmax(0, 1fr); gap: 32px; }
+}
+.gutter { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+@media (min-width: 900px) { .gutter { flex-direction: column; gap: 4px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); align-self: start; } }
+
+.chip {
+  font-family: var(--font-mono); font-size: 0.74rem; line-height: 1;
+  border: 1px solid hsl(var(--ink) / 0.6); padding: 7px 10px; background: hsl(var(--paper));
+  color: hsl(var(--ink)); cursor: pointer; white-space: nowrap;
+}
+.chip:hover { border-color: hsl(var(--mark)); color: hsl(var(--mark)); }
+.chip[aria-pressed="true"] { background: hsl(var(--ink)); color: hsl(var(--paper)); border-color: hsl(var(--ink)); }
+
+.panel { background: hsl(var(--wash)); border: 1px solid hsl(var(--rule)); }
+
+.verse { white-space: pre-line; font-style: italic; }
+.formula { white-space: pre-line; font-family: var(--font-mono); font-size: 0.84rem; line-height: 1.7; }
